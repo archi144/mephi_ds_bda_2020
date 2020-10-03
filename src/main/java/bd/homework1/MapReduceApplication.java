@@ -21,6 +21,7 @@ public class MapReduceApplication {
 
     public static void main(String[] args) throws Exception {
 
+
         if (args.length < 2) {
             throw new RuntimeException("You should specify input and output folders!");
         }
@@ -44,10 +45,10 @@ public class MapReduceApplication {
         Writable value = (Writable) reader.getValueClass().newInstance();
         log.info("=====================RESULT========================");
         while (reader.next(key, value))
-            System.out.println(key + " " + value);
+            System.out.println(key + ":" + value);
         reader.close();
         // print counters
-        Counter counter = job.getCounters().findCounter(CounterType.MALFORMED);
+        Counter counter = job.getCounters().findCounter(CounterType.MALFORMED_WORDS);
         log.info("=====================COUNTERS " + counter.getName() + ": " + counter.getValue() + "=====================");
     }
 }

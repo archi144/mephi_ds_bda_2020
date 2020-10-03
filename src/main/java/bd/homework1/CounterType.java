@@ -1,8 +1,8 @@
 package bd.homework1;
 
 /**
- * Тип счётчика для подсчета статистики по битым strokam
+ * Counter for MALFORMED Words
  */
 public enum CounterType {
-    MALFORMED
+    MALFORMED_WORDS
 }

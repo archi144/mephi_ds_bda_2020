@@ -7,13 +7,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Редьюсер: суммирует все единицы полученные от {@link HW1Mapper}, выдаёт суммарное количество пользователей по браузерам
+ * Reducer: Gets words by {@link HW1Mapper} and keep longest word[s]
  */
 public class HW1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
 
     private final ArrayList<String> long_words = new ArrayList<String>();
     private int max_length = Integer.MIN_VALUE;
 
+    /**
+     * Reduce methond searches longest word[s] and write its to ArrayList<String> also kept the biggest length of words
+     * @param key key from {@link HW1Mapper} output
+     * @param values values from {@link HW1Mapper} output
+     * @param context MapReduce job context
+     * @throws IOException          Throws on context.write
+     * @throws InterruptedException Throws on context.write
+     */
     @Override
     protected void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
         String word = key.toString();
@@ -30,6 +38,13 @@ public class HW1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         }
     }
 
+    /**
+     * Cleanup method for MapReduce process, which write all longest words into context
+     *
+     * @param context MapReduce job context
+     * @throws IOException          Throws on context.write
+     * @throws InterruptedException Throws on context.write
+     */
     @Override
     public void cleanup(Context context) throws IOException, InterruptedException {
         for (String word : long_words) {

@@ -4,52 +4,70 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 /**
- * Маппер: парсит UserAgent из логов, к каждому браузеру присваиваем в соответствие единицу
+ * Mapper: get the line and write words in to job context without spec symbols and non-ASCII symbols
  */
 public class HW1Mapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
     private final static IntWritable length = new IntWritable();
+    private final String tokens = " #$%,.[\\]!*+/:\"&();<=>^~\n\r\t";
     private Text word = new Text();
 
+
+
+    /**
+     * Map method for MapReduce process. Check
+     * words on non-MALFORMED words and write good words
+     * in to job context
+     *
+     * @param key     Key of MapReduce input, unused
+     * @param value   Input text
+     * @param context MapReduce job context, unused
+     * @throws IOException          Throws on context.write
+     * @throws InterruptedException Throws on context.write
+     */
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         String line = value.toString();
-        boolean IS_ASCII = line.matches("\\A\\p{ASCII}*\\z");
-        if (IS_ASCII) {
-            length.set(line.length());
-            word.set(line);
-            context.write(word, length);
-        } else {
-            context.getCounter(CounterType.MALFORMED).increment(1);
-            int tmp_length = 0;
-            String tmp_word = "";
-            for (int i=0; i <line.length(); i++) {
-                char ch = line.charAt(i);
-                IS_ASCII = String.valueOf(ch).matches("\\A\\p{ASCII}*\\z");
-                if (!IS_ASCII) {
-                    if (tmp_length == 0) {
-                        continue;
-                    }
-                    else {
-                        word.set(tmp_word);
-                        length.set(tmp_length);
-                        context.write(word, length);
-                        tmp_length = 0;
-                        tmp_word = "";
+        StringTokenizer tokenizer = new StringTokenizer(line, tokens);
+        while (tokenizer.hasMoreTokens()) {
+            String str = tokenizer.nextToken();
+            boolean IS_ASCII = str.matches("\\A\\p{ASCII}*\\z");
+            if (IS_ASCII) {
+                length.set(str.length());
+                word.set(str);
+                context.write(word, length);
+            } else {
+                context.getCounter(CounterType.MALFORMED_WORDS).increment(1);
+                int tmp_length = 0;
+                String tmp_word = "";
+                for (int i = 0; i < str.length(); i++) {
+                    char ch = str.charAt(i);
+                    IS_ASCII = String.valueOf(ch).matches("\\A\\p{ASCII}*\\z");
+                    if (!IS_ASCII) {
+                        if (tmp_length == 0) {
+                            continue;
+                        } else {
+                            if (tmp_length != 0 && tmp_word!="") {
+                                word.set(tmp_word);
+                                length.set(tmp_length);
+                                context.write(word, length);
+                                tmp_length = 0;
+                                tmp_word = "";
+                            }
+                        }
+                    } else {
+                        tmp_word += String.valueOf(ch);
+                        tmp_length += 1;
                     }
                 }
-                else {
-                    tmp_word += String.valueOf(ch);
-                    tmp_length += 1;
-                }
+                word.set(tmp_word);
+                length.set(tmp_length);
+                context.write(word, length);
             }
-            word.set(tmp_word);
-            length.set(tmp_length);
-            context.write(word, length);
         }
     }
 }

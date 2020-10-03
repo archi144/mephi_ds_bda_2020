@@ -11,23 +11,28 @@ import java.util.ArrayList;
  */
 public class HW1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
 
+    private final ArrayList<String> long_words = new ArrayList<String>();
+    private int max_length = Integer.MIN_VALUE;
+
     @Override
     protected void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-        int max_length = 0;
         String word = key.toString();
-        ArrayList long_words = new ArrayList();
         while (values.iterator().hasNext()) {
-            if (values.iterator().next().get() > max_length)
-            {
-                max_length = values.iterator().next().get();
+            int tmp_length = values.iterator().next().get();
+            if (tmp_length == max_length) {
+                long_words.add(word);
+            }
+            else if (tmp_length > max_length) {
+                max_length = tmp_length;
                 long_words.clear();
                 long_words.add(word);
             }
-            else if (values.iterator().next().get() == max_length) {
-                long_words.add(word);
-            }
         }
-        for (int i=0; i < long_words.size(); i++) {
+    }
+
+    @Override
+    public void cleanup(Context context) throws IOException, InterruptedException {
+        for (String word : long_words) {
             context.write(new Text(word), new IntWritable(max_length));
         }
     }

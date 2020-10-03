@@ -25,22 +25,31 @@ public class HW1Mapper extends Mapper<LongWritable, Text, Text, IntWritable> {
             context.write(word, length);
         } else {
             context.getCounter(CounterType.MALFORMED).increment(1);
-            int tmp_length = 1;
-            int lower_threshold = 0;
+            int tmp_length = 0;
+            String tmp_word = "";
             for (int i=0; i <line.length(); i++) {
                 char ch = line.charAt(i);
                 IS_ASCII = String.valueOf(ch).matches("\\A\\p{ASCII}*\\z");
                 if (!IS_ASCII) {
-                    tmp_length = i - lower_threshold;
-                    word.set(line.substring(lower_threshold,i));
-                    length.set(tmp_length);
-                    lower_threshold = i;
-                    context.write(word, length);
+                    if (tmp_length == 0) {
+                        continue;
+                    }
+                    else {
+                        word.set(tmp_word);
+                        length.set(tmp_length);
+                        context.write(word, length);
+                        tmp_length = 0;
+                        tmp_word = "";
+                    }
                 }
                 else {
+                    tmp_word += String.valueOf(ch);
                     tmp_length += 1;
                 }
             }
+            word.set(tmp_word);
+            length.set(tmp_length);
+            context.write(word, length);
         }
     }
 }

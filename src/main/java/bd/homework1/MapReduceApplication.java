@@ -21,8 +21,8 @@ public class MapReduceApplication {
             throw new RuntimeException("You should specify input and output folders!");
         }
         Configuration conf = new Configuration();
-        // задаём выходной файл, разделенный запятыми - формат CSV в соответствии с заданием
-        conf.set("mapreduce.output.textoutputformat.separator", ",");
+        // задаём выходной файл, разделенный запятыми - формат CSV в соответствии awdwadwf
+        conf.set("mapreduce.output.textoutputformat.separator", ":");
 
         Job job = Job.getInstance(conf, "browser count");
         job.setJarByClass(MapReduceApplication.class);
@@ -31,7 +31,6 @@ public class MapReduceApplication {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
         job.setOutputFormatClass(TextOutputFormat.class);
-
         Path outputDirectory = new Path(args[1]);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, outputDirectory);

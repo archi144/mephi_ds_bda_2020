@@ -30,7 +30,7 @@ Compile jar
 [yourUser@localhost homework1]$ mvn install
 ```
 
-Run programm
+Run program
 --
 ```sh
 [yourUser@localhost homework1]$ hadoop jar /path/to/builded/homework1-1.0-SNAPSHOT-jar-with-dependencies.jar input output

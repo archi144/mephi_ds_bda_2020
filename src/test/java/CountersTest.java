@@ -20,8 +20,9 @@ public class CountersTest {
     private MapDriver<LongWritable, Text, Text, IntWritable> mapDriver;
 
     private final String MalforedString1 = "Я вам не ASCII!";
-    private final String MalforedString2 = "Я вредина!";
+    private final String MalforedString2 = "Я АСКИИ!";
     private final String GoodString = "I am ASCII!";
+
     @Before
     public void setUp() {
         HW1Mapper mapper = new HW1Mapper();
@@ -32,9 +33,6 @@ public class CountersTest {
     public void testMapperCounterThree() throws IOException  {
         mapDriver
                 .withInput(new LongWritable(), new Text(MalforedString1))
-                .withOutput(new Text(), new IntWritable(0))
-                .withOutput(new Text(), new IntWritable(0))
-                .withOutput(new Text(), new IntWritable(0))
                 .withOutput(new Text("ASCII"), new IntWritable(5))
                 .runTest();
         assertEquals("Expected 3 counter increment", 3, mapDriver.getCounters()
@@ -45,8 +43,6 @@ public class CountersTest {
     public void testMapperCounterTwo() throws IOException {
         mapDriver
                 .withInput(new LongWritable(), new Text(MalforedString2))
-                .withOutput(new Text(), new IntWritable(0))
-                .withOutput(new Text(), new IntWritable(0))
                 .runTest();
         assertEquals("Expected 2 counter increment", 2, mapDriver.getCounters()
                 .findCounter(CounterType.MALFORMED_WORDS).getValue());

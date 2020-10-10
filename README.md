@@ -9,7 +9,7 @@ Minimal system requirements
 Java 8  
 Apache Maven 4.0.0  
 Hadoop 3.1.1  
-
+OS Linux any distributive
 
 Prepare data
 --

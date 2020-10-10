@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
 public class HW1Mapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
     private final static IntWritable length = new IntWritable();
-    private final String tokens = " #$%,.[\\]!*+/:\"&();<=>^~\n\r\t";
+    private final String tokens = " #$%,.[\\]!@*+-_/:\"&();<=>^~\n\r\t";
     private Text word = new Text();
 
 
@@ -34,7 +34,7 @@ public class HW1Mapper extends Mapper<LongWritable, Text, Text, IntWritable> {
         String line = value.toString();
         StringTokenizer tokenizer = new StringTokenizer(line, tokens);
         while (tokenizer.hasMoreTokens()) {
-            String str = tokenizer.nextToken();
+                String str = tokenizer.nextToken();
             boolean IS_ASCII = str.matches("\\A\\p{ASCII}*\\z");
             if (IS_ASCII) {
                 length.set(str.length());
@@ -42,31 +42,29 @@ public class HW1Mapper extends Mapper<LongWritable, Text, Text, IntWritable> {
                 context.write(word, length);
             } else {
                 context.getCounter(CounterType.MALFORMED_WORDS).increment(1);
-                int tmp_length = 0;
                 String tmp_word = "";
                 for (int i = 0; i < str.length(); i++) {
                     char ch = str.charAt(i);
                     IS_ASCII = String.valueOf(ch).matches("\\A\\p{ASCII}*\\z");
                     if (!IS_ASCII) {
-                        if (tmp_length == 0) {
+                        if (tmp_word.length() == 0) {
                             continue;
-                        } else {
-                            if (tmp_length != 0 && tmp_word!="") {
-                                word.set(tmp_word);
-                                length.set(tmp_length);
-                                context.write(word, length);
-                                tmp_length = 0;
-                                tmp_word = "";
-                            }
+                        }
+                        else {
+                            word.set(tmp_word);
+                            length.set(tmp_word.length());
+                            context.write(word, length);
+                            tmp_word = "";
                         }
                     } else {
                         tmp_word += String.valueOf(ch);
-                        tmp_length += 1;
                     }
                 }
-                word.set(tmp_word);
-                length.set(tmp_length);
-                context.write(word, length);
+                if (tmp_word.length() !=0) {
+                    word.set(tmp_word);
+                    length.set(tmp_word.length());
+                    context.write(word, length);
+                }
             }
         }
     }

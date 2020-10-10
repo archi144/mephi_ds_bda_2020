@@ -24,7 +24,7 @@ public class MapReduceTest {
     private MapReduceDriver<LongWritable, Text, Text, IntWritable, Text, IntWritable> mapReduceDriver;
 
     private final String testStr1 = "Good test";
-    private final String testStr3 = "Veryсуперgood,!ауф test";
+    private final String testStr3 = "Veryсуперgood, тестовый test";
     @Before
     public void setUp() {
         HW1Mapper mapper = new HW1Mapper();
